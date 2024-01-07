@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Deck of Cards</title>
+</head>
+
+<body>
+    <h1>Deck of Cards</h1>
+    <button id="drawCardButton">Draw a Card</button>
+    <div id="cardDisplay"></div>
+
+    <script>
+        async function createNewDeck() {
+            const response = await fetch('https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1');
+            const data = await response.json();
+            return data.deck_id;
+        }
+
+        async function drawCard(deckId) {
+            const response = await fetch(`https://deckofcardsapi.com/api/deck/${deckId}/draw/?count=1`);
+            const data = await response.json();
+            return data.cards[0];
+        }
+
+        let deckId;
+        createNewDeck().then((id) => {
+            deckId = id;
+        });
+
+        async function displayCard() {
+            const cardDisplay = document.getElementById('cardDisplay');
+            const card = await drawCard(deckId);
+
+            if (card) {
+                const cardInfo = `${card.value} of ${card.suit}`;
+                const cardElement = document.createElement('p');
+                cardElement.textContent = cardInfo;
+                cardDisplay.appendChild(cardElement);
+            } else {
+                document.getElementById('drawCardButton').disabled = true;
+            }
+        }
+
+        const drawCardButton = document.getElementById('drawCardButton');
+        drawCardButton.addEventListener('click', displayCard);
+    </script>
+</body>
+
+</html>
